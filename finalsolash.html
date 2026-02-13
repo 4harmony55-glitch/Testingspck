@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DropCart - Campus Marketplace</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a0e17;
+            color: #fff;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated gradient background — unchanged */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, #0a0e17, #1a1f2e, #0f1525, #1d2435);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+            z-index: -2;
+        }
+
+        @keyframes gradient-shift {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Particle effect — unchanged */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            /* COLOR CHANGE: white → brand amber tint */
+            background: rgba(255, 184, 77, 0.07);
+            animation: float-particle linear infinite;
+        }
+
+        @keyframes float-particle {
+            to { transform: translateY(-100vh); }
+        }
+
+        /* Main container — unchanged */
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Logo styling — unchanged layout */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: logo-appear 1.2s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes logo-appear {
+            0%   { opacity: 0; transform: translateY(30px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .logo-main {
+            font-size: 5.5rem;
+            font-weight: 900;
+            /* COLOR CHANGE: cyan → brand amber-to-purple */
+            background: linear-gradient(to right, #FFB84D 0%, #6B21A8 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 10px;
+            /* COLOR CHANGE: blue shadow → amber shadow */
+            text-shadow: 0 10px 30px rgba(255, 184, 77, 0.2);
+        }
+
+        .logo-tagline {
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #a0b3d9;
+            margin-top: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo-tagline::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 2px;
+            /* COLOR CHANGE: cyan line → amber line */
+            background: linear-gradient(to right, transparent, #FFB84D, transparent);
+            bottom: -8px;
+            left: 20%;
+        }
+
+        /* Icon scene — unchanged */
+        .icon-scene {
+            position: relative;
+            width: 380px;
+            height: 280px;
+            margin: 0 auto 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: icon-float 6s ease-in-out infinite;
+        }
+
+        @keyframes icon-float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50%       { transform: translateY(-15px) scale(1.05); }
+        }
+
+        /* CSS Icon — unchanged */
+        .css-icon {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            transform: skewX(-8deg);
+            animation: icon-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes icon-pulse {
+            0%, 100% { transform: skewX(-8deg) scale(1); }
+            50%       { transform: skewX(-8deg) scale(1.05); }
+        }
+
+        /* Cart body — unchanged, white stays white */
+        .cart-body {
+            position: absolute;
+            bottom: 35px;
+            left: 30px;
+            width: 140px;
+            height: 100px;
+            border: 8px solid #fff;
+            border-top: none;
+            border-radius: 0 0 25px 25px;
+            box-sizing: border-box;
+            /* COLOR CHANGE: blue glow → amber glow */
+            box-shadow: 0 0 30px rgba(255, 184, 77, 0.3);
+        }
+
+        .cart-body::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -8px;
+            width: 8px;
+            height: 20px;
+            background: #fff;
+        }
+
+        /* Cart box — COLOR CHANGE: teal #0EA5A4 → brand amber #FFB84D */
+        .cart-box {
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            width: 70px;
+            height: 70px;
+            background: #FFB84D;
+            border-radius: 10px;
+            z-index: 2;
+            /* COLOR CHANGE: teal shadow → amber shadow */
+            box-shadow: 0 0 30px rgba(255, 184, 77, 0.5);
+            animation: box-bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes box-bounce {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-15px); }
+        }
+
+        /* Wheels — COLOR CHANGE: slate #475569 → brand blue #1E40AF */
+        .wheels {
+            position: absolute;
+            bottom: 30px;
+            left: 35px;
+            width: 130px;
+            height: 20px;
+        }
+
+        .wheels::before, .wheels::after {
+            content: '';
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background: #1E40AF;
+            border-radius: 50%;
+            /* COLOR CHANGE: blue shadow → brand blue shadow */
+            box-shadow: 0 0 20px rgba(30, 64, 175, 0.5);
+            animation: wheel-spin 3s linear infinite;
+        }
+
+        .wheels::after {
+            right: 0;
+        }
+
+        @keyframes wheel-spin {
+            0%   { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Road — COLOR CHANGE: blue shadow → amber shadow */
+        .road {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                rgba(255, 255, 255, 0.4),
+                rgba(255, 255, 255, 0.2),
+                transparent);
+            bottom: 20px;
+            border-radius: 2px;
+            animation: road-move 2s linear infinite;
+            /* COLOR CHANGE: blue glow → amber glow */
+            box-shadow: 0 0 20px rgba(255, 184, 77, 0.3);
+        }
+
+        @keyframes road-move {
+            0%   { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Loading indicator — unchanged layout */
+        .loading-container {
+            width: 300px;
+            text-align: center;
+            margin-top: 40px;
+            animation: fade-in 1.5s ease-out 0.5s forwards;
+            opacity: 0;
+        }
+
+        @keyframes fade-in {
+            0%   { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #a0b3d9;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            transition: color 0.4s ease;
+        }
+
+        .loading-text.complete {
+            /* Turn purple when done */
+            color: #9D4FDB;
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loading-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            /* COLOR CHANGE: cyan → brand amber/blue/purple */
+            background: linear-gradient(to right, #FFB84D, #1E40AF, #6B21A8);
+            border-radius: 2px;
+            /* NOTE: animation is now JS-controlled — see script below */
+            /* COLOR CHANGE: blue glow → amber glow */
+            box-shadow: 0 0 10px rgba(255, 184, 77, 0.5);
+            transition: width 0.1s linear;
+        }
+
+        /* Glow — COLOR CHANGE: blue → amber */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 184, 77, 0.12) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            animation: glow-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50%       { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* Floating elements — unchanged */
+        .floating-element {
+            position: absolute;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #a0b3d9;
+            font-size: 1.5rem;
+            z-index: 1;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            animation: float-element 15s ease-in-out infinite;
+        }
+
+        .element-1 { width: 60px; height: 60px; top: 15%; left: 10%;    animation-delay: 0s; }
+        .element-2 { width: 50px; height: 50px; top: 20%; right: 12%;   animation-delay: -5s; }
+        .element-3 { width: 70px; height: 70px; bottom: 25%; left: 15%; animation-delay: -10s; }
+        .element-4 { width: 40px; height: 40px; bottom: 15%; right: 10%;animation-delay: -7s; }
+
+        @keyframes float-element {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33%       { transform: translateY(-20px) rotate(120deg); }
+            66%       { transform: translateY(10px) rotate(240deg); }
+        }
+
+        /* Powered by — bottom watermark */
+        .powered-by {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 20;
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            opacity: 0;
+            animation: fade-in 1s ease-out 1s forwards;
+        }
+        .powered-by span { color: rgba(255,255,255,0.2); font-family:'Poppins',sans-serif; font-weight:300; }
+        .powered-by strong {
+            color: rgba(255,255,255,0.45);
+            font-family:'Poppins',sans-serif;
+            font-weight:700;
+            padding: 3px 10px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 4px;
+        }
+
+        /* Exit fade */
+        body.exiting {
+            animation: exitFade 0.6s ease forwards;
+        }
+        @keyframes exitFade {
+            to { opacity: 0; }
+        }
+
+        /* Responsive — unchanged */
+        @media (max-width: 768px) {
+            .logo-main { font-size: 4rem; }
+            .icon-scene { width: 320px; height: 240px; }
+            .css-icon { width: 160px; height: 160px; }
+            .cart-body { width: 120px; height: 80px; bottom: 40px; left: 20px; border-width: 6px; }
+            .cart-box { width: 60px; height: 60px; top: 20px; left: 40px; }
+            .wheels { width: 110px; left: 25px; }
+            .wheels::before, .wheels::after { width: 20px; height: 20px; }
+            .floating-element { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .logo-main { font-size: 3rem; }
+            .logo-tagline { font-size: 0.9rem; letter-spacing: 2px; }
+            .icon-scene { width: 280px; height: 200px; }
+            .css-icon { width: 140px; height: 140px; }
+            .cart-body { width: 100px; height: 70px; bottom: 35px; left: 20px; border-width: 5px; }
+            .cart-box { width: 50px; height: 50px; top: 20px; left: 30px; }
+            .wheels { width: 90px; left: 25px; }
+            .wheels::before, .wheels::after { width: 18px; height: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated gradient background -->
+    <div class="gradient-bg"></div>
+
+    <!-- Particle effects -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Main content -->
+    <div class="container">
+        <!-- Glow effect behind icon -->
+        <div class="glow"></div>
+
+        <!-- Floating UI elements -->
+        <div class="floating-element element-1"><i class="fas fa-tag"></i></div>
+        <div class="floating-element element-2"><i class="fas fa-shipping-fast"></i></div>
+        <div class="floating-element element-3"><i class="fas fa-shield-alt"></i></div>
+        <div class="floating-element element-4"><i class="fas fa-award"></i></div>
+
+        <!-- Logo -->
+        <div class="logo-container">
+            <h1 class="logo-main">DROPCART</h1>
+            <div class="logo-tagline">YOUR CAMPUS MARKETPLACE</div>
+        </div>
+
+        <!-- Icon -->
+        <div class="icon-scene">
+            <div class="css-icon">
+                <div class="cart-box"></div>
+                <div class="cart-body"></div>
+                <div class="wheels"></div>
+            </div>
+            <div class="road"></div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div class="loading-container">
+            <div class="loading-text" id="loading-text">LOADING PREMIUM EXPERIENCE</div>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Powered by Harmony Inc. -->
+    <div class="powered-by">
+        <span>Powered by</span>
+        <strong>Harmony Inc.</strong>
+    </div>
+
+    <script>
+        // ── 1. PARTICLES ────────────────────────────────────────────────────
+        (function createParticles() {
+            const container = document.getElementById('particles');
+            const count = 50;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                const size = Math.random() * 2 + 1;
+                p.style.cssText = [
+                    'width:'             + size + 'px',
+                    'height:'            + size + 'px',
+                    'left:'              + (Math.random() * 100) + '%',
+                    'top:'               + (Math.random() * 100 + 100) + '%',
+                    'animation-duration:'+ (Math.random() * 10 + 10) + 's',
+                    'animation-delay:'   + (Math.random() * 5) + 's',
+                ].join(';');
+                container.appendChild(p);
+            }
+        })();
+
+        // ── 2. LOADING SEQUENCE ─────────────────────────────────────────────
+        // Phases shown as the bar fills
+        var PHASES = [
+            { at:  0,  text: 'LOADING PREMIUM EXPERIENCE' },
+            { at: 30,  text: 'LOADING PRODUCTS...'        },
+            { at: 55,  text: 'SYNCING CATALOGUE...'       },
+            { at: 78,  text: 'ALMOST READY...'            },
+            { at: 100, text: 'DROPCART READY'           },
+        ];
+
+        var progress  = 0;
+        var lastPhase = 0;
+        var bar       = document.getElementById('loading-progress');
+        var textEl    = document.getElementById('loading-text');
+
+        var iv = setInterval(function () {
+            progress = Math.min(100, progress + 0.7);
+            bar.style.width = progress + '%';
+
+            // Update phase text
+            for (var i = PHASES.length - 1; i >= 0; i--) {
+                if (progress >= PHASES[i].at && i > lastPhase) {
+                    textEl.textContent = PHASES[i].text;
+                    lastPhase = i;
+                    break;
+                }
+            }
+
+            if (progress >= 100) {
+                clearInterval(iv);
+                textEl.classList.add('complete');
+
+                // ── 3. REDIRECT TO MAIN APP ─────────────────────────────
+                // Waits 900ms so user sees "EXPERIENCE READY", then fades
+                // out and goes to the main app (index.html / React app).
+                setTimeout(function () {
+                    document.body.classList.add('exiting');
+                    setTimeout(function () {
+                        // Change '/index.html' to '/' if your app uses root URL
+                        window.location.replace('/index.html');
+                    }, 650);
+                }, 900);
+            }
+        }, 25);
+
+        // ── 4. PWA BRIDGE ───────────────────────────────────────────────────
+        // If this page is loaded inside a WebView (e.g. future mobile wrapper),
+        // the message is passed back to the native layer.
+        window.addEventListener('message', function(e) {
+            if (e.data === 'TRIGGER_EXIT') exitNow();
+        });
+    </script>
+</body>
+</html>

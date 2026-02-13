@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropcart - Premium E-commerce</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a0e17;
+            color: #fff;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated gradient background */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, #0a0e17, #1a1f2e, #0f1525, #1d2435);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+            z-index: -2;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Particle effect */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            animation: float-particle linear infinite;
+        }
+
+        @keyframes float-particle {
+            to { transform: translateY(-100vh); }
+        }
+
+        /* Main container */
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Logo styling */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: logo-appear 1.2s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes logo-appear {
+            0% { opacity: 0; transform: translateY(30px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .logo-main {
+            font-size: 5.5rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 10px;
+            text-shadow: 0 10px 30px rgba(79, 172, 254, 0.2);
+        }
+
+        .logo-tagline {
+            font-size: 1.2rem;
+            font-weight: 400;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #a0b3d9;
+            margin-top: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo-tagline::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #4facfe, transparent);
+            bottom: -8px;
+            left: 20%;
+        }
+
+        /* Cart animation container */
+        .cart-scene {
+            position: relative;
+            width: 380px;
+            height: 280px;
+            margin: 0 auto 50px;
+            perspective: 1200px;
+        }
+
+        .cart-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: cart-float 6s ease-in-out infinite;
+        }
+
+        @keyframes cart-float {
+            0%, 100% { transform: translateY(0) rotateX(0); }
+            50% { transform: translateY(-15px) rotateX(5deg); }
+        }
+
+        /* Cart body */
+        .cart-body {
+            position: absolute;
+            width: 240px;
+            height: 140px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 20px 20px 12px 12px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .cart-body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .cart-body::after {
+            content: '';
+            position: absolute;
+            top: 40%;
+            left: 10%;
+            width: 80%;
+            height: 30%;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+        }
+
+        .cart-handle {
+            position: absolute;
+            width: 80px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            top: 40px;
+            right: -40px;
+            transform: rotate(20deg);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .cart-handle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -2px;
+            right: -10px;
+        }
+
+        /* Cart wheels */
+        .wheel {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2d3748, #1a202c);
+            top: 130px;
+            z-index: 1;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4),
+                        inset 0 5px 10px rgba(0, 0, 0, 0.5),
+                        inset 0 -5px 10px rgba(255, 255, 255, 0.05);
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: wheel-spin 1.5s linear infinite;
+        }
+
+        @keyframes wheel-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .wheel::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            box-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
+        }
+
+        .wheel::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .wheel-1 {
+            left: 50px;
+        }
+
+        .wheel-2 {
+            right: 50px;
+        }
+
+        /* Road effect */
+        .road {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                        transparent, 
+                        rgba(255, 255, 255, 0.2), 
+                        rgba(255, 255, 255, 0.4), 
+                        rgba(255, 255, 255, 0.2), 
+                        transparent);
+            bottom: 60px;
+            border-radius: 2px;
+            animation: road-move 2s linear infinite;
+            box-shadow: 0 0 20px rgba(79, 172, 254, 0.3);
+        }
+
+        @keyframes road-move {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Loading indicator */
+        .loading-container {
+            width: 300px;
+            text-align: center;
+            margin-top: 40px;
+            animation: fade-in 1.5s ease-out 0.5s forwards;
+            opacity: 0;
+        }
+
+        @keyframes fade-in {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .loading-text {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #a0b3d9;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loading-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            border-radius: 2px;
+            animation: loading 3s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+        }
+
+        @keyframes loading {
+            0% { width: 0%; left: 0; }
+            50% { width: 100%; left: 0; }
+            100% { width: 0%; left: 100%; }
+        }
+
+        /* Glow effects */
+        .glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.15) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            animation: glow-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* Floating elements */
+        .floating-element {
+            position: absolute;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #a0b3d9;
+            font-size: 1.5rem;
+            z-index: 1;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            animation: float-element 15s ease-in-out infinite;
+        }
+
+        .element-1 {
+            width: 60px;
+            height: 60px;
+            top: 15%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .element-2 {
+            width: 50px;
+            height: 50px;
+            top: 20%;
+            right: 12%;
+            animation-delay: -5s;
+        }
+
+        .element-3 {
+            width: 70px;
+            height: 70px;
+            bottom: 25%;
+            left: 15%;
+            animation-delay: -10s;
+        }
+
+        .element-4 {
+            width: 40px;
+            height: 40px;
+            bottom: 15%;
+            right: 10%;
+            animation-delay: -7s;
+        }
+
+        @keyframes float-element {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(120deg); }
+            66% { transform: translateY(10px) rotate(240deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .logo-main {
+                font-size: 4rem;
+            }
+            
+            .cart-scene {
+                width: 320px;
+                height: 240px;
+            }
+            
+            .cart-body {
+                width: 200px;
+                height: 120px;
+            }
+            
+            .wheel {
+                width: 60px;
+                height: 60px;
+                top: 110px;
+            }
+            
+            .floating-element {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-main {
+                font-size: 3rem;
+            }
+            
+            .logo-tagline {
+                font-size: 0.9rem;
+                letter-spacing: 2px;
+            }
+            
+            .cart-scene {
+                width: 280px;
+                height: 200px;
+            }
+            
+            .cart-body {
+                width: 180px;
+                height: 100px;
+            }
+            
+            .wheel {
+                width: 50px;
+                height: 50px;
+                top: 95px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated gradient background -->
+    <div class="gradient-bg"></div>
+    
+    <!-- Particle effects -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Main content -->
+    <div class="container">
+        <!-- Glow effect behind cart -->
+        <div class="glow"></div>
+        
+        <!-- Floating UI elements -->
+        <div class="floating-element element-1">
+            <i class="fas fa-tag"></i>
+        </div>
+        <div class="floating-element element-2">
+            <i class="fas fa-shipping-fast"></i>
+        </div>
+        <div class="floating-element element-3">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="floating-element element-4">
+            <i class="fas fa-award"></i>
+        </div>
+        
+        <!-- Logo -->
+        <div class="logo-container">
+            <h1 class="logo-main">DROPCART</h1>
+            <div class="logo-tagline">PREMIUM E-COMMERCE</div>
+        </div>
+        
+        <!-- Animated cart -->
+        <div class="cart-scene">
+            <div class="cart-container">
+                <!-- Cart body -->
+                <div class="cart-body">
+                    <div class="cart-handle"></div>
+                </div>
+                
+                <!-- Wheels -->
+                <div class="wheel wheel-1"></div>
+                <div class="wheel wheel-2"></div>
+                
+                <!-- Road effect -->
+                <div class="road"></div>
+            </div>
+        </div>
+        
+        <!-- Loading indicator -->
+        <div class="loading-container">
+            <div class="loading-text">LOADING PREMIUM EXPERIENCE</div>
+            <div class="loading-bar">
+            <div class ="Loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create particle effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 1px and 3px
+                const size = Math.random() * 2 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100 + 100}%`;
+                
+                // Random animation duration between 10s and 20s
+                const duration = Math.random() * 10 + 10;
+                particle.style.animationDuration = `${duration}s`;
+                
+                // Random delay
+                const delay = Math.random() * 5;
+                particle.style.animationDelay = `${delay}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Simulate loading completion after 5 seconds (in a real app, this would wait for actual loading)
+            setTimeout(() => {
+                document.querySelector('.loading-text').textContent = "EXPERIENCE READY";
+                document.querySelector('.loading-progress').style.animation = 'none';
+                document.querySelector('.loading-progress').style.width = '100%';
+                
+                // In a real app, you would redirect to the main app here
+                // setTimeout(() => { window.location.href = "/main-app"; }, 1000);
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

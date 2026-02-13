@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropcart Splash</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        /* The vibrant mesh background */
+        .background-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff0080 0%, #7928ca 40%, #1a1a2e 100%);
+            z-index: 1;
+        }
+
+        /* Animated blobs for the "Filx" style organic movement */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: 2;
+            opacity: 0.8;
+            animation: float 15s infinite alternate ease-in-out;
+        }
+
+        .orb-1 { width: 300px; height: 300px; background: #fb7185; top: 10%; left: 10%; }
+        .orb-2 { width: 400px; height: 400px; background: #6366f1; bottom: 10%; right: 5%; animation-delay: -5s; }
+
+        @keyframes float {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(40px, 80px) scale(1.1); }
+        }
+
+        /* The Full-Screen Glass Overlay */
+        .glass-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.1); /* Very faint white tint */
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content {
+            text-align: center;
+            color: white;
+        }
+
+        .logo-text {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin: 0;
+            /* Subtitles shadow to help legibility against bright colors */
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-text span {
+            font-weight: 300;
+            opacity: 0.8;
+        }
+
+        /* Subtle loading indicator */
+        .loader {
+            margin-top: 20px;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top: 3px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-canvas">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div class="glass-overlay">
+        <div class="content">
+            <h1 class="logo-text">DROP<span>CART</span></h1>
+            <center><div class="loader"></div></center>
+        </div>
+    </div>
+
+</body>
+</html>

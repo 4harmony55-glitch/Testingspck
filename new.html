@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DropCart</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --amber:   #FFB84D;
+            --amber-d: #e8961f;
+            --blue:    #1E40AF;
+            --blue-l:  #3B6FE8;
+            --purple:  #6B21A8;
+            --purple-l:#9D4FDB;
+            --bg:      #07070f;
+            --bg2:     #0d0d1c;
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: #fff;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ══ CANVAS (particle layer) ═══════════════════════════════════════ */
+        #particle-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            opacity: .85;
+        }
+
+        /* ══ AMBIENT GLOW BLOBS ════════════════════════════════════════════ */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .blob-amber {
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(255,184,77,.18) 0%, transparent 70%);
+            top: -80px; left: -80px;
+            animation: blobDrift 12s ease-in-out infinite;
+        }
+        .blob-blue {
+            width: 380px; height: 380px;
+            background: radial-gradient(circle, rgba(30,64,175,.22) 0%, transparent 70%);
+            bottom: -60px; right: -60px;
+            animation: blobDrift 10s ease-in-out 3s infinite reverse;
+        }
+        .blob-purple {
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(107,33,168,.18) 0%, transparent 70%);
+            top: 40%; left: 50%;
+            transform: translateX(-50%);
+            animation: blobDrift 14s ease-in-out 1.5s infinite;
+        }
+        @keyframes blobDrift {
+            0%,100% { transform: translate(0,0) scale(1); }
+            33%      { transform: translate(30px,-20px) scale(1.08); }
+            66%      { transform: translate(-20px,30px) scale(0.94); }
+        }
+
+        /* ══ CORNER BRACKETS ═══════════════════════════════════════════════ */
+        .bracket {
+            position: fixed;
+            width: 36px; height: 36px;
+            z-index: 20;
+            opacity: 0;
+            animation: fadeIn 1s .6s ease forwards;
+        }
+        .bracket svg { width:100%; height:100%; }
+        .bracket.tl { top:24px;  left:24px; }
+        .bracket.tr { top:24px;  right:24px;  transform:scaleX(-1); }
+        .bracket.bl { bottom:24px; left:24px;  transform:scaleY(-1); }
+        .bracket.br { bottom:24px; right:24px; transform:scale(-1); }
+        @keyframes fadeIn { to { opacity:1; } }
+
+        /* ══ MAIN CONTENT ══════════════════════════════════════════════════ */
+        .stage {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            gap: 0;
+        }
+
+        /* ══ LOGO ══════════════════════════════════════════════════════════ */
+        .logo-wrap {
+            text-align: center;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateY(28px);
+            animation: riseUp 1s .2s cubic-bezier(.22,1,.36,1) forwards;
+        }
+        @keyframes riseUp {
+            to { opacity:1; transform:translateY(0); }
+        }
+        .logo-text {
+            font-size: clamp(3.2rem, 12vw, 5.6rem);
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 1;
+            background: linear-gradient(115deg, var(--amber) 0%, #fff 38%, var(--purple-l) 70%, var(--blue-l) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 0 28px rgba(255,184,77,.3));
+            animation: logoShimmer 6s ease-in-out 1.2s infinite;
+            background-size: 200% 100%;
+        }
+        @keyframes logoShimmer {
+            0%,100% { background-position: 0% 50%; }
+            50%      { background-position: 100% 50%; }
+        }
+        .logo-tagline {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(.65rem, 2.8vw, .85rem);
+            font-weight: 300;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.45);
+            margin-top: 10px;
+            position: relative;
+            display: inline-block;
+        }
+        .logo-tagline::before,
+        .logo-tagline::after {
+            content: '';
+            position: absolute;
+            height: 1px;
+            width: 34px;
+            top: 50%;
+            background: linear-gradient(90deg, transparent, rgba(255,184,77,.5));
+        }
+        .logo-tagline::before { right: calc(100% + 12px); }
+        .logo-tagline::after  { left:  calc(100% + 12px); transform: scaleX(-1); }
+
+        /* ══ CART SCENE ════════════════════════════════════════════════════ */
+        .cart-scene {
+            position: relative;
+            width: min(360px, 88vw);
+            height: min(260px, 55vw);
+            margin: 28px auto 20px;
+            perspective: 1400px;
+            opacity: 0;
+            animation: fadeIn .8s .5s ease forwards;
+        }
+
+        /* central glow under cart */
+        .cart-glow {
+            position: absolute;
+            width: 220px; height: 100px;
+            bottom: -10px; left: 50%;
+            transform: translateX(-50%);
+            background: radial-gradient(ellipse, rgba(255,184,77,.22) 0%, transparent 70%);
+            filter: blur(18px);
+            animation: glowPulse 3s ease-in-out infinite;
+            border-radius: 50%;
+        }
+        @keyframes glowPulse { 0%,100%{opacity:.7;transform:translateX(-50%) scaleX(1)} 50%{opacity:1;transform:translateX(-50%) scaleX(1.15)} }
+
+        .cart-rig {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: cartFloat 5s ease-in-out infinite;
+        }
+        @keyframes cartFloat {
+            0%,100% { transform: translateY(0) rotateX(2deg) rotateY(0deg); }
+            50%      { transform: translateY(-14px) rotateX(6deg) rotateY(2deg); }
+        }
+
+        /* Cart body */
+        .cart-body {
+            position: absolute;
+            width: 56%;
+            height: 52%;
+            top: 18%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 20px 20px 10px 10px;
+            background: linear-gradient(160deg,
+                rgba(255,184,77,.13) 0%,
+                rgba(30,64,175,.1) 60%,
+                rgba(107,33,168,.08) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,184,77,.2);
+            box-shadow:
+                0 24px 48px rgba(0,0,0,.45),
+                0 0 0 1px rgba(255,255,255,.04),
+                inset 0 1px 0 rgba(255,255,255,.12);
+            overflow: hidden;
+        }
+        /* Glass shine strip */
+        .cart-body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 45%;
+            background: linear-gradient(180deg, rgba(255,255,255,.07) 0%, transparent 100%);
+            border-radius: 20px 20px 0 0;
+        }
+        /* Interior shelf */
+        .cart-body::after {
+            content: '';
+            position: absolute;
+            bottom: 22%; left: 10%; right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255,184,77,.3), transparent);
+        }
+
+        /* Amber accent stripe on cart body left edge */
+        .cart-stripe {
+            position: absolute;
+            left: 0; top: 15%; bottom: 15%;
+            width: 3px;
+            border-radius: 2px;
+            background: linear-gradient(180deg, var(--amber), var(--blue-l), var(--purple-l));
+            box-shadow: 0 0 12px var(--amber);
+        }
+
+        /* Shopping items peeking out */
+        .cart-item {
+            position: absolute;
+            border-radius: 5px;
+            background: linear-gradient(135deg, rgba(255,184,77,.25), rgba(30,64,175,.2));
+            border: 1px solid rgba(255,255,255,.08);
+        }
+        .item-1 { width:28%; height:50%; top:8%; left:12%; }
+        .item-2 { width:22%; height:40%; top:12%; left:44%; background:linear-gradient(135deg,rgba(107,33,168,.25),rgba(255,184,77,.15)); }
+        .item-3 { width:18%; height:35%; top:15%; left:70%; }
+
+        /* Handle */
+        .cart-handle {
+            position: absolute;
+            width: 22%;
+            height: 7%;
+            top: 30%;
+            right: 17%;
+            border-radius: 6px;
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,184,77,.15);
+            transform: rotate(20deg);
+        }
+        .cart-handle::after {
+            content: '';
+            position: absolute;
+            width: 18px; height: 18px;
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(255,184,77,.2);
+            border-radius: 50%;
+            right: -9px; top: -5px;
+        }
+
+        /* Wheels */
+        .wheel {
+            position: absolute;
+            bottom: 2%;
+            width: 20%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: conic-gradient(
+                rgba(30,64,175,.6) 0deg,
+                rgba(107,33,168,.7) 120deg,
+                rgba(255,184,77,.6) 240deg,
+                rgba(30,64,175,.6) 360deg
+            );
+            box-shadow:
+                0 6px 16px rgba(0,0,0,.5),
+                0 0 20px rgba(255,184,77,.2),
+                inset 0 0 0 3px rgba(0,0,0,.4);
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .wheel::before {
+            content: '';
+            position: absolute;
+            width: 36%; height: 36%;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            border-radius: 50%;
+            background: var(--amber);
+            box-shadow: 0 0 14px var(--amber), 0 0 28px rgba(255,184,77,.4);
+        }
+        .wheel::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border-radius: 50%;
+            border: 1.5px dashed rgba(255,255,255,.15);
+        }
+        .wheel-l { left: 12%; }
+        .wheel-r { right: 12%; }
+
+        /* Road */
+        .road {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255,184,77,.5) 25%,
+                rgba(30,64,175,.6) 50%,
+                rgba(107,33,168,.5) 75%,
+                transparent 100%);
+            border-radius: 2px;
+            box-shadow: 0 0 12px rgba(255,184,77,.3);
+            animation: roadFlow 2s linear infinite;
+        }
+        @keyframes roadFlow { from{background-position:0%} to{background-position:200%} }
+
+        /* ══ FLOATING BADGES ═══════════════════════════════════════════════ */
+        .badge {
+            position: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 8px 24px rgba(0,0,0,.3);
+            animation: floatBadge 14s ease-in-out infinite;
+            z-index: 9;
+            opacity: 0;
+        }
+        .badge-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 12px;
+        }
+        .badge-icon { font-size: 1.5rem; line-height: 1; }
+        .badge-label {
+            font-size: .55rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            opacity: .7;
+        }
+        @keyframes floatBadge {
+            0%,100% { transform: translateY(0) rotate(0deg); }
+            33%      { transform: translateY(-18px) rotate(4deg); }
+            66%      { transform: translateY(10px) rotate(-3deg); }
+        }
+
+        .b1 { width:68px; top:14%; left:7%;    background:rgba(255,184,77,.07);  border-color:rgba(255,184,77,.2); color:var(--amber);  animation-delay:0s;   animation:fadeIn .6s 1s ease forwards, floatBadge 13s 1s ease-in-out infinite; }
+        .b2 { width:68px; top:12%; right:7%;   background:rgba(30,64,175,.1);    border-color:rgba(59,111,232,.3); color:var(--blue-l); animation-delay:-5s;  animation:fadeIn .6s 1.2s ease forwards, floatBadge 11s 1.2s ease-in-out infinite; }
+        .b3 { width:68px; bottom:22%; left:5%; background:rgba(107,33,168,.1);   border-color:rgba(157,79,219,.3); color:var(--purple-l);animation-delay:-8s; animation:fadeIn .6s 1.4s ease forwards, floatBadge 15s 1.4s ease-in-out infinite; }
+        .b4 { width:68px; bottom:18%; right:5%;background:rgba(255,184,77,.07);  border-color:rgba(255,184,77,.2); color:var(--amber);  animation-delay:-3s;  animation:fadeIn .6s 1.6s ease forwards, floatBadge 12s 1.6s ease-in-out infinite; }
+
+        /* ══ PROGRESS SECTION ══════════════════════════════════════════════ */
+        .progress-wrap {
+            width: min(340px, 84vw);
+            text-align: center;
+            opacity: 0;
+            animation: riseUp .8s .8s ease forwards;
+        }
+
+        .loading-phase {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(.62rem, 2.4vw, .78rem);
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255,184,77,.8);
+            margin-bottom: 12px;
+            height: 1.4em;
+            text-shadow: 0 0 12px rgba(255,184,77,.4);
+            transition: opacity .3s ease, color .5s ease;
+        }
+        .loading-phase.complete {
+            color: var(--purple-l);
+            text-shadow: 0 0 16px rgba(157,79,219,.6);
+            letter-spacing: 5px;
+        }
+
+        .bar-track {
+            width: 100%;
+            height: 3px;
+            background: rgba(255,255,255,.06);
+            border-radius: 3px;
+            overflow: visible;
+            position: relative;
+        }
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--amber) 0%, var(--blue-l) 50%, var(--purple-l) 100%);
+            background-size: 200% 100%;
+            box-shadow: 0 0 10px rgba(255,184,77,.7), 0 0 22px rgba(30,64,175,.4);
+            transition: width .08s linear;
+            position: relative;
+        }
+        /* Glowing tip */
+        .bar-fill::after {
+            content: '';
+            position: absolute;
+            right: -4px; top: -4px;
+            width: 11px; height: 11px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 6px var(--amber), 0 0 14px var(--amber), 0 0 26px rgba(255,184,77,.5);
+        }
+
+        /* ══ POWERED BY ════════════════════════════════════════════════════ */
+        .powered-by {
+            position: fixed;
+            bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            z-index: 20;
+            opacity: 0;
+            animation: fadeIn .8s 1s ease forwards;
+        }
+        .powered-by span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: .68rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.2);
+        }
+        .harmony-badge {
+            font-family: 'Poppins', sans-serif;
+            font-size: .62rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.5);
+            padding: 4px 11px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 5px;
+            background: rgba(255,255,255,.03);
+        }
+
+        /* ══ TRANSITION OUT ════════════════════════════════════════════════ */
+        body.exiting {
+            animation: exitFade .6s ease forwards;
+        }
+        @keyframes exitFade {
+            to { opacity:0; transform:scale(1.04); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Ambient blobs -->
+    <div class="blob blob-amber"></div>
+    <div class="blob blob-blue"></div>
+    <div class="blob blob-purple"></div>
+
+    <!-- Corner brackets -->
+    <div class="bracket tl">
+        <svg viewBox="0 0 36 36" fill="none">
+            <path d="M2 22 L2 2 L22 2" stroke="rgba(255,184,77,0.55)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <div class="bracket tr">
+        <svg viewBox="0 0 36 36" fill="none">
+            <path d="M2 22 L2 2 L22 2" stroke="rgba(30,64,175,0.55)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <div class="bracket bl">
+        <svg viewBox="0 0 36 36" fill="none">
+            <path d="M2 22 L2 2 L22 2" stroke="rgba(107,33,168,0.55)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </div>
+    <div class="bracket br">
+        <svg viewBox="0 0 36 36" fill="none">
+            <path d="M2 22 L2 2 L22 2" stroke="rgba(255,184,77,0.4)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </div>
+
+    <!-- Floating badges -->
+    <div class="badge b1">
+        <div class="badge-inner">
+            <span class="badge-icon">🏷️</span>
+            <span class="badge-label" style="color:var(--amber)">Deals</span>
+        </div>
+    </div>
+    <div class="badge b2">
+        <div class="badge-inner">
+            <span class="badge-icon">⚡</span>
+            <span class="badge-label" style="color:var(--blue-l)">Fast</span>
+        </div>
+    </div>
+    <div class="badge b3">
+        <div class="badge-inner">
+            <span class="badge-icon">🔒</span>
+            <span class="badge-label" style="color:var(--purple-l)">Secure</span>
+        </div>
+    </div>
+    <div class="badge b4">
+        <div class="badge-inner">
+            <span class="badge-icon">🏆</span>
+            <span class="badge-label" style="color:var(--amber)">Trusted</span>
+        </div>
+    </div>
+
+    <!-- Main stage -->
+    <div class="stage">
+
+        <!-- Logo -->
+        <div class="logo-wrap">
+            <div class="logo-text">DROPCART</div>
+            <div class="logo-tagline">Your Campus Marketplace</div>
+        </div>
+
+        <!-- 3D Cart -->
+        <div class="cart-scene">
+            <div class="cart-glow"></div>
+            <div class="cart-rig">
+                <div class="cart-body">
+                    <div class="cart-stripe"></div>
+                    <div class="cart-item item-1"></div>
+                    <div class="cart-item item-2"></div>
+                    <div class="cart-item item-3"></div>
+                    <div class="cart-handle"></div>
+                </div>
+                <div class="wheel wheel-l"></div>
+                <div class="wheel wheel-r"></div>
+                <div class="road"></div>
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-wrap">
+            <div class="loading-phase" id="phase-text">Initializing...</div>
+            <div class="bar-track">
+                <div class="bar-fill" id="bar-fill"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Powered by Harmony Inc. -->
+    <div class="powered-by">
+        <span>Powered by</span>
+        <div class="harmony-badge">Harmony Inc.</div>
+    </div>
+
+    <script>
+    // ── Brand-color particle system ──────────────────────────────────────────
+    (function(){
+        const canvas = document.getElementById('particle-canvas');
+        const ctx    = canvas.getContext('2d');
+        const W = () => canvas.width  = window.innerWidth;
+        const H = () => canvas.height = window.innerHeight;
+        W(); H();
+        window.addEventListener('resize', ()=>{ W(); H(); });
+
+        // Only brand colors
+        const COLORS = [
+            [255,184,77],   // amber
+            [59,111,232],   // blue (brightened)
+            [157,79,219],   // purple (brightened)
+        ];
+
+        const COUNT = Math.min(90, Math.floor(window.innerWidth / 10));
+        const particles = Array.from({length: COUNT}, () => {
+            const c = COLORS[Math.floor(Math.random() * 3)];
+            return {
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight + window.innerHeight,
+                size: Math.random() * 2.2 + .5,
+                speed: Math.random() * .6 + .2,
+                opacity: Math.random() * .45 + .1,
+                color: c,
+                wobble: Math.random() * Math.PI * 2,
+                wobbleSpeed: Math.random() * .008 + .003,
+                wobbleAmp: Math.random() * 28 + 8,
+            };
+        });
+
+        function tick() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.y      -= p.speed;
+                p.wobble += p.wobbleSpeed;
+                p.opacity = .15 + .35 * Math.sin(p.wobble);
+                if (p.y < -10) {
+                    p.y = canvas.height + 10;
+                    p.x = Math.random() * canvas.width;
+                }
+                const [r,g,b] = p.color;
+                const xPos = p.x + Math.sin(p.wobble) * p.wobbleAmp;
+                ctx.beginPath();
+                ctx.arc(xPos, p.y, p.size, 0, Math.PI*2);
+                ctx.fillStyle = `rgba(${r},${g},${b},${p.opacity})`;
+                ctx.fill();
+            });
+            requestAnimationFrame(tick);
+        }
+        tick();
+    })();
+
+    // ── Loading sequence ─────────────────────────────────────────────────────
+    const PHASES = [
+        { at: 0,   text: "Initializing..."        },
+        { at: 22,  text: "Loading Assets..."       },
+        { at: 48,  text: "Syncing Products..."     },
+        { at: 72,  text: "Preparing Your Store..."  },
+        { at: 90,  text: "Almost Ready..."         },
+        { at: 100, text: "DROPCART READY ✦"        },
+    ];
+
+    const bar       = document.getElementById('bar-fill');
+    const phaseEl   = document.getElementById('phase-text');
+    let progress    = 0;
+    let lastPhase   = 0;
+    let done        = false;
+
+    const iv = setInterval(() => {
+        if (done) return;
+        progress = Math.min(100, progress + .65);
+
+        // Update bar
+        bar.style.width = progress + '%';
+        // Slide gradient left→right as it fills
+        const bgPos = (1 - progress / 100) * 100;
+        bar.style.backgroundPosition = bgPos + '% 50%';
+
+        // Phase transitions
+        for (let i = PHASES.length - 1; i >= 0; i--) {
+            if (progress >= PHASES[i].at && i > lastPhase) {
+                phaseEl.textContent = PHASES[i].text;
+                lastPhase = i;
+                if (i === PHASES.length - 1) phaseEl.classList.add('complete');
+                break;
+            }
+        }
+
+        if (progress >= 100) {
+            done = true;
+            clearInterval(iv);
+            // Hide the tip dot when complete
+            bar.style.setProperty('--after-display', 'none');
+            setTimeout(exitSplash, 1100);
+        }
+    }, 25);
+
+    function exitSplash() {
+        document.body.classList.add('exiting');
+        setTimeout(() => {
+            // PWA: go to main app
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage('SPLASH_DONE', '*');
+            } else {
+                window.location.replace('./index.html');
+            }
+        }, 650);
+    }
+    </script>
+</body>
+</html>

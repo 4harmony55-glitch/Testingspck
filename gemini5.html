@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DropCart Brand Assets</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F172A;        /* Dark Neutral */
+    --surface: #1E293B;   /* Slightly lighter dark */
+    --accent: #0EA5A4;    /* Trust Teal */
+    --text: #F8FAFC;      /* White-ish */
+    --border: #334155;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  /* --- 1. THE PURE CSS LOGO (As Requested) --- */
+  .brand-header {
+    margin-bottom: 50px;
+    text-align: center;
+  }
+  
+  .logo-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    /* Hover effect for micro-interaction */
+    cursor: default;
+  }
+
+  /* Text Styling */
+  .logo-text {
+    font-size: 2.5rem;
+    font-weight: 600; /* Medium-SemiBold */
+    letter-spacing: -0.02em;
+    color: #fff;
+    line-height: 1;
+  }
+  .logo-text span { color: var(--accent); } /* The 'C' or 'Drop' can be accented if desired, keeping it clean for now */
+
+  /* The Icon - Built with CSS Shapes (No SVG) */
+  .css-icon {
+    width: 48px;
+    height: 48px;
+    position: relative;
+    /* Forward leaning motion */
+    transform: skewX(-8deg); 
+  }
+
+  /* The Cart Body (U-shape) */
+  .cart-body {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    width: 36px;
+    height: 24px;
+    border: 3px solid #fff;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    box-sizing: border-box;
+  }
+
+  /* The Cart Handle */
+  .cart-body::after {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: -3px;
+    width: 3px;
+    height: 6px;
+    background: #fff;
+  }
+
+  /* The "Product" Box (Aggregation Symbol) */
+  .cart-box {
+    position: absolute;
+    top: 4px;
+    left: 10px;
+    width: 16px;
+    height: 16px;
+    background: var(--accent); /* Teal */
+    border-radius: 2px;
+    z-index: 2;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Micro-interaction: Box drops in on hover */
+  .logo-container:hover .cart-box {
+    transform: translateY(3px);
+  }
+
+  /* Wheels (Abstracted dots) */
+  .wheels {
+    position: absolute;
+    bottom: 0;
+    left: 8px;
+    width: 28px;
+    height: 4px;
+  }
+  .wheels::before, .wheels::after {
+    content: '';
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: #475569; /* Muted wheel color */
+    border-radius: 50%;
+  }
+  .wheels::after { right: 0; }
+
+
+  /* --- 2. THE GENERATOR UI --- */
+  canvas { display: none; }
+  
+  .preview-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  .preview-img {
+    width: 128px;
+    height: 128px;
+    border-radius: 24px; /* iOS style */
+    display: block;
+  }
+
+  .section-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94A3B8;
+    margin-bottom: 15px;
+  }
+
+  .btn-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .dl-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--accent);
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+  }
+
+  .dl-btn:hover {
+    background: rgba(14, 165, 164, 0.1); /* Teal tint */
+    border-color: var(--accent);
+  }
+
+  .note {
+    margin-top: 40px;
+    font-size: 0.8rem;
+    color: #64748B;
+    line-height: 1.6;
+    max-width: 500px;
+    text-align: center;
+  }
+  
+  strong { color: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="brand-header">
+    <div class="section-title">Visual CSS Preview</div>
+    <div class="logo-container">
+      <div class="css-icon">
+        <div class="cart-box"></div>
+        <div class="cart-body"></div>
+        <div class="wheels"></div>
+      </div>
+      <div class="logo-text">DropCart</div>
+    </div>
+  </div>
+
+  <hr style="border:0; border-top:1px solid #334155; width:100px; margin:0 auto 40px;">
+
+  <div class="section-title">App Icon Generator</div>
+  
+  <div class="preview-card">
+    <canvas id="c"></canvas>
+    <img id="preview" class="preview-img" alt="Icon Preview">
+  </div>
+
+  <div class="btn-grid" id="buttons"></div>
+
+  <p class="note">
+    <strong>Developer Note:</strong> The preview above generates pure PNGs based on the brand geometry. 
+    Use the <strong>192px</strong> and <strong>512px</strong> versions for your `manifest.json`.
+  </p>
+
+<script>
+const SIZES = [72, 96, 128, 144, 152, 192, 384, 512];
+
+// Core Logic to Draw the "DropCart" Geometry on Canvas
+function drawIcon(size) {
+  const c = document.getElementById('c');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  
+  // --- 1. Background (Dark Neutral) ---
+  ctx.fillStyle = '#0F172A'; // Dark Slate
+  ctx.beginPath();
+  // Drawing a squircle or rect based on preference. Let's do a standard rounded rect.
+  // Using simple rect filling for full-bleed icons
+  ctx.rect(0, 0, size, size);
+  ctx.fill();
+
+  // --- 2. Setup Geometry Scaling ---
+  // We work on a 100x100 grid conceptual model, then scale to 'size'
+  const unit = size / 100;
+  
+  ctx.save();
+  
+  // Center the drawing context
+  ctx.translate(size/2, size/2);
+  
+  // Apply the Brand "Motion" (Skew -8deg)
+  // a, b, c, d, e, f -> c is horizontal skew
+  ctx.transform(1, 0, -0.14, 1, 0, 0); // approx -8deg skew
+
+  // Center alignment adjustment after skew
+  ctx.translate(-size*0.25, -size*0.25); 
+
+  // Variables for geometry (Relative to 0-50 coordinate space approx)
+  const cartColor = '#FFFFFF';
+  const accentColor = '#0EA5A4'; // Teal
+  const wheelColor = '#475569'; // Muted Slate
+
+  // --- 3. Draw The "Product" Box (The Drop) ---
+  // Drawn first so it can sit 'behind' the front lip if we wanted, 
+  // but brand guide says "inside/above".
+  ctx.fillStyle = accentColor;
+  
+  // Box position
+  const boxX = unit * 22;
+  const boxY = unit * 15;
+  const boxSize = unit * 20;
+  
+  ctx.beginPath();
+  ctx.roundRect 
+    ? ctx.roundRect(boxX, boxY, boxSize, boxSize, unit * 3) 
+    : ctx.rect(boxX, boxY, boxSize, boxSize);
+  ctx.fill();
+
+  // --- 4. Draw The Cart (U-Shape) ---
+  ctx.strokeStyle = cartColor;
+  ctx.lineWidth = unit * 4;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  const cartW = unit * 44;
+  const cartH = unit * 30;
+  const cartX = unit * 15;
+  const cartY = unit * 30; // Box sits at 15, Cart top edge is roughly at 30
+  
+  ctx.beginPath();
+  // Start top-left of U
+  ctx.moveTo(cartX, cartY);
+  // Down to bottom-left
+  ctx.lineTo(cartX, cartY + cartH);
+  // Across to bottom-right
+  ctx.lineTo(cartX + cartW, cartY + cartH);
+  // Up to top-right
+  ctx.lineTo(cartX + cartW, cartY);
+  ctx.stroke();
+
+  // --- 5. Cart Handle ---
+  // Small vertical line extending up from right side
+  ctx.beginPath();
+  ctx.moveTo(cartX + cartW, cartY);
+  ctx.lineTo(cartX + cartW, cartY - unit * 8);
+  ctx.stroke();
+
+  // --- 6. Wheels (Abstract dots) ---
+  ctx.restore(); // Remove skew for wheels (optional, but wheels usually look better round)
+  
+  // Re-calculate position since we removed translation/skew
+  // We need to approximate where the bottom of the cart landed.
+  const wheelY = size * 0.68;
+  const wheelR = size * 0.04;
+  const wheelLeft = size * 0.38;
+  const wheelRight = size * 0.62;
+
+  ctx.fillStyle = wheelColor;
+  
+  // Left Wheel
+  ctx.beginPath();
+  ctx.arc(wheelLeft, wheelY, wheelR, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Right Wheel
+  ctx.beginPath();
+  ctx.arc(wheelRight, wheelY, wheelR, 0, Math.PI * 2);
+  ctx.fill();
+
+  return c.toDataURL('image/png');
+}
+
+// Draw initial preview (512px is crispest)
+const previewData = drawIcon(512);
+document.getElementById('preview').src = previewData;
+
+// Generate download buttons
+const grid = document.getElementById('buttons');
+SIZES.forEach(size => {
+  const data = drawIcon(size);
+  const a = document.createElement('a');
+  a.className = 'dl-btn';
+  a.href = data;
+  a.download = `dropcart-icon-${size}x${size}.png`;
+  a.textContent = `${size}px`;
+  grid.appendChild(a);
+});
+</script>
+</body>
+</html>

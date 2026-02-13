@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropcart Splash Screen</title>
+    <style>
+        :root {
+            --bg-gradient: mesh-gradient(at 0% 0%, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            /* Creating the vibrant organic background */
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background-attachment: fixed;
+            overflow: hidden;
+        }
+
+        /* Animated background blobs to enhance the "Glass" distortion */
+        .bg-blobs {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: move 20s infinite alternate;
+        }
+
+        .blob-1 { width: 400px; height: 400px; background: #ff0080; top: -100px; left: -100px; }
+        .blob-2 { width: 500px; height: 500px; background: #7928ca; bottom: -150px; right: -100px; animation-delay: -5s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0); }
+            to { transform: translate(100px, 100px); }
+        }
+
+        .glass-pane {
+            width: 320px;
+            height: 540px;
+            /* White fill at 15% opacity */
+            background: rgba(255, 255, 255, 0.12);
+            /* Backdrop blur for the frosted effect */
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            /* Gradient border: brighter at top-left, fading at bottom-right */
+            border: 1.5px solid;
+            border-image-source: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.05) 100%);
+            border-image-slice: 1;
+            border-radius: 40px; /* Note: border-image-slice can conflict with radius in some browsers; used standard border below for safety */
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 40px;
+            
+            /* High spread shadow to make it pop */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: white;
+            font-weight: 200;
+            letter-spacing: 0.4em;
+            margin: 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .loading-container {
+            position: absolute;
+            bottom: 60px;
+            width: 140px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            width: 40%;
+            height: 100%;
+            background: white;
+            box-shadow: 0 0 10px white;
+            border-radius: 2px;
+            animation: loading 2s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(250%); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="glass-pane">
+        <div class="logo-container">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+        </div>
+        <h1>DROPCART</h1>
+        <div class="loading-container">
+            <div class="loading-bar"></div>
+        </div>
+    </div>
+
+</body>
+</html>

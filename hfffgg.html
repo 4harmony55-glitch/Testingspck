@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DropCart Infinity Splash</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #050505; /* Near black */
+        }
+
+        #canvas1 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            filter: contrast(1.5) brightness(1.2); /* Hyper-neon look */
+        }
+
+        /* The Loading UI */
+        #ui-layer {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #0ff;
+            box-shadow: 0 0 15px #0ff;
+            transition: width 0.1s linear;
+        }
+
+        #loading-text {
+            color: #0ff;
+            font-size: 12px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #0ff;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas1"></canvas>
+    
+    <div id="ui-layer">
+        <div id="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+        <div id="loading-text">System Initializing...</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas1');
+        const ctx = canvas.getContext('2d');
+        const progressBar = document.getElementById('progress-bar');
+        const loadingText = document.getElementById('loading-text');
+        const uiLayer = document.getElementById('ui-layer');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+        let isLoaded = false;
+        
+        // MOUSE INTERACTION
+        const mouse = { x: null, y: null, radius: 100 };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        // SETTINGS
+        const SETTINGS = {
+            text: "DropCart",
+            particleGap: 3, // Lower = More particles (Heavier), Higher = Faster
+            springSpeed: 0.1, // How fast they fly to text
+            springFriction: 0.85, // Bounciness (Lower = more wobble)
+            vortexSpeed: 0.05 // Speed of the loading spin
+        };
+
+        class Particle {
+            constructor(x, y) {
+                // Target Position (The Text)
+                this.originX = x;
+                this.originY = y;
+                
+                // Current Position (Start in random circle)
+                const angle = Math.random() * Math.PI * 2;
+                const r = Math.random() * 200 + 50;
+                this.x = canvas.width/2 + Math.cos(angle) * r;
+                this.y = canvas.height/2 + Math.sin(angle) * r;
+                
+                // Physics Properties
+                this.vx = 0; // Velocity X
+                this.vy = 0; // Velocity Y
+                this.size = Math.random() * 2 + 0.5;
+                
+                // For the Vortex Animation
+                this.angle = Math.random() * 360;
+                this.orbitRadius = Math.random() * 150 + 50;
+                this.orbitSpeed = (Math.random() * 0.05) + 0.02;
+                
+                // Color offset
+                this.colorOffset = Math.random() * 100;
+            }
+
+            draw() {
+                // Dynamic Neon Color
+                // Cycles through Cyan, Blue, Purple based on position and time
+                const hue = (Date.now() * 0.1) + this.colorOffset + (this.x * 0.1);
+                ctx.fillStyle = `hsl(${hue}, 80%, 60%)`;
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            update() {
+                // === MODE 1: INFINITY VORTEX (LOADING) ===
+                if (!isLoaded) {
+                    this.angle += this.orbitSpeed;
+                    const cx = canvas.width/2;
+                    const cy = canvas.height/2;
+                    
+                    // The Infinity (Figure 8) Math
+                    // x = cos(t), y = sin(2t) creates a figure 8
+                    this.x = cx + Math.cos(this.angle) * (this.orbitRadius * 2); 
+                    this.y = cy + Math.sin(this.angle * 2) * this.orbitRadius;
+                    
+                    // Add some noise so it looks like a cloud, not a perfect line
+                    this.x += (Math.random() - 0.5) * 5;
+                    this.y += (Math.random() - 0.5) * 5;
+                } 
+                
+                // === MODE 2: MAGNETIC ASSEMBLY (TEXT FORMATION) ===
+                else {
+                    // 1. Calculate distance to Target (origin)
+                    const dx = this.originX - this.x;
+                    const dy = this.originY - this.y;
+                    
+                    // 2. Spring Physics (The "Sloppy/Bouncy" Magic)
+                    // Instead of moving directly there, we add force to velocity
+                    const forceX = dx * SETTINGS.springSpeed;
+                    const forceY = dy * SETTINGS.springSpeed;
+                    
+                    this.vx += forceX;
+                    this.vy += forceY;
+                    
+                    // 3. Friction (Dampening)
+                    // Without this, they would vibrate forever. 
+                    this.vx *= SETTINGS.springFriction;
+                    this.vy *= SETTINGS.springFriction;
+                    
+                    // 4. Apply Velocity
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // 5. Mouse Interaction (Disperse on hover)
+                    const distMouse = Math.hypot(mouse.x - this.x, mouse.y - this.y);
+                    if (distMouse < mouse.radius) {
+                        const angleM = Math.atan2(mouse.y - this.y, mouse.x - this.x);
+                        this.vx -= Math.cos(angleM) * 2;
+                        this.vy -= Math.sin(angleM) * 2;
+                    }
+                }
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            
+            // 1. Setup Text on Canvas (Invisible)
+            let fontSize = window.innerWidth < 768 ? 60 : 150;
+            ctx.font = `900 ${fontSize}px "Orbitron", sans-serif`;
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Draw text to read pixels
+            ctx.fillText(SETTINGS.text, canvas.width/2, canvas.height/2);
+            
+            // 2. Scan Pixels
+            const textCoordinates = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            
+            // 3. Create Particles
+            for (let y = 0; y < textCoordinates.height; y += SETTINGS.particleGap) {
+                for (let x = 0; x < textCoordinates.width; x += SETTINGS.particleGap) {
+                    // Check alpha (transparency) > 128
+                    if (textCoordinates.data[(y * 4 * textCoordinates.width) + (x * 4) + 3] > 128) {
+                        particlesArray.push(new Particle(x, y));
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            // Trail Effect: 
+            // We use a very low opacity rectangle to clear the screen. 
+            // This leaves "trails" of the previous frame.
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Additive Blending (Neon Effect)
+            ctx.globalCompositeOperation = 'lighter'; 
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].draw();
+                particlesArray[i].update();
+            }
+            
+            ctx.globalCompositeOperation = 'source-over';
+            requestAnimationFrame(animate);
+        }
+
+        // === SIMULATED LOADING LOGIC ===
+        let progress = 0;
+        let loadInterval = setInterval(() => {
+            progress += 0.8; // Speed of loading bar
+            if(progress >= 100) progress = 100;
+            
+            // Update UI
+            progressBar.style.width = `${progress}%`;
+            
+            if (progress === 100) {
+                clearInterval(loadInterval);
+                finishLoading();
+            }
+        }, 20);
+
+        function finishLoading() {
+            loadingText.innerText = "ACCESS GRANTED";
+            
+            // Trigger the formation!
+            isLoaded = true;
+            
+            // Fade out the UI bar
+            setTimeout(() => {
+                uiLayer.style.opacity = '0';
+            }, 500);
+        }
+
+        // Handle Window Resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        // Start
+        init();
+        animate();
+
+    </script>
+</body>
+</html>
